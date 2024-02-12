@@ -10,57 +10,38 @@ const UserDetails = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    gender: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    address: {
+    country: {
       type: DataTypes.STRING,
     },
-    nationalId: {
-      type: DataTypes.STRING,
-    },
-    nationality: {
-      type: DataTypes.STRING,
-    },
-    dob: {
-      type: DataTypes.STRING,
-    },
-    profession: {
-      type: DataTypes.STRING,
-    },
-    photoTypeId: {
-      type: DataTypes.STRING,
-    },
-    photoId: {
-      type: DataTypes.STRING,
-    },
-    photoFront: {
-      type: DataTypes.STRING,
-    },
-    photoBack: {
-      type: DataTypes.STRING,
-    },
-    photoGuest: {
+    state: {
       type: DataTypes.STRING,
     },
     city: {
       type: DataTypes.STRING,
     },
-    passportNo: {
+    homeTown: {
       type: DataTypes.STRING,
     },
-    balance: {
-      type: DataTypes.DECIMAL(10, 2),
-    },
-    bookingNo: {
+    propertyTypes: {
       type: DataTypes.STRING,
     },
-    visaNo: {
+    isSublet: {
+      type: DataTypes.BOOLEAN,
+    },
+    units: {
       type: DataTypes.STRING,
     },
-    purpose: {
+    petInfo: {
       type: DataTypes.STRING,
+    },
+    moreInfo: {
+      type: DataTypes.STRING,
+    },
+    unKnownDetails: {
+      type: DataTypes.STRING,
+    },
+    isRentedBefore: {
+      type: DataTypes.BOOLEAN,
     },
     loggedInUserId: {
       type: DataTypes.INTEGER,
@@ -68,6 +49,7 @@ const UserDetails = sequelize.define(
   },
   {
     tableName: "UserDetails",
+    updatedAt: false,
   }
 );
 

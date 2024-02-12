@@ -6,18 +6,28 @@ require("dotenv").config();
 const {
   login,
   addUser,
-  forgetPass,
-  fpUpdatePass,
   logOut,
+  forgetPass,
   updateUser,
-  getUserById,
-  updatePassword,
   getAllUsers,
-  createUserDetails,
+  getUserById,
+  fpUpdatePass,
   createUserType,
-  updateUserDetails,
-  getUserDetails,
+  updatePassword,
+  createPropertyRental,
+  getPropertyRentalDetails,
+  createFavoritedProperties,
+  updatePropertyRentalDetails,
+  getFavoritedPropertiesDetails,
+  updateFavoritedPropertiesDetails,
 } = require("../controllers/userController");
+
+const {
+  createSavedSearches,
+  getAllSearchDetails,
+  deleteSearchDetails,
+  getSearchDetailsById,
+} = require("../controllers/searchController");
 
 // --------------------------------------- User Route ----------------------------------------------------------------------------------
 
@@ -27,16 +37,62 @@ router.post("/user/login", login);
 router.get("/user/logout", logOut);
 router.post("/user/forgotpass", forgetPass);
 router.post("/user/resetpass", fpUpdatePass);
-router.post("/user/userDetails", validateTokenMiddleware, createUserDetails);
+router.post(
+  "/user/propertyRental",
+  validateTokenMiddleware,
+  createPropertyRental
+);
+router.post(
+  "/user/favoritiesProperties",
+  validateTokenMiddleware,
+  createFavoritedProperties
+);
 router.put("/user/update", validateTokenMiddleware, updateUser);
 router.put(
-  "/user/updateUserDetails",
+  "/user/updatePropertyRentalDetails",
   validateTokenMiddleware,
-  updateUserDetails
+  updatePropertyRentalDetails
+);
+router.put(
+  "/user/updateFavoritedPropertiesDetails",
+  validateTokenMiddleware,
+  updateFavoritedPropertiesDetails
 );
 router.patch("/user/updatePassword", validateTokenMiddleware, updatePassword);
 router.get("/user/getUserById", validateTokenMiddleware, getUserById);
 router.get("/user/getAllUsers", validateTokenMiddleware, getAllUsers);
-router.get("/user/getUserDetails", validateTokenMiddleware, getUserDetails);
+router.get(
+  "/user/getPropertyRentalDetails",
+  validateTokenMiddleware,
+  getPropertyRentalDetails
+);
+router.get(
+  "/user/getFavoritedPropertiesDetails",
+  validateTokenMiddleware,
+  getFavoritedPropertiesDetails
+);
+
+// --------------------------------------- Saved Searches Route ----------------------------------------------------------------------------------
+
+router.post(
+  "/saved-search/create-saved-searches",
+  validateTokenMiddleware,
+  createSavedSearches
+);
+router.get(
+  "/saved-search/fetchAll-saved-searches",
+  validateTokenMiddleware,
+  getAllSearchDetails
+);
+router.get(
+  "/saved-search/fetch-saved-searches/:searchId",
+  validateTokenMiddleware,
+  getSearchDetailsById
+);
+router.delete(
+  "/saved-search/delete-saved-searches/:searchId",
+  validateTokenMiddleware,
+  deleteSearchDetails
+);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const UserDetails = require("../models/userDetails");
+const PropertyRental = require("../models/propertyRental");
 const UserType = require("../models/userType");
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
@@ -11,6 +11,7 @@ const {
 } = require("../helper/side");
 const moment = require("moment");
 const { sendMail } = require("../helper/sendMail");
+const FavoritedProperties = require("../models/favoritedProperties");
 
 const secretKey = process.env.TOKEN_secret_key;
 const expiresIn = "24h";
@@ -43,7 +44,8 @@ const addUser = asyncHandler(async (req, res) => {
     }
 
     reqBody.password = await encryptPassword(reqBody.password);
-    reqBody.displayName = reqBody.firstName.toLowerCase() + "." + reqBody.lastName.toLowerCase()
+    reqBody.displayName =
+      reqBody.firstName.toLowerCase() + "." + reqBody.lastName.toLowerCase();
 
     const userInfo = await User.create({
       ...reqBody,
@@ -89,64 +91,57 @@ const addUser = asyncHandler(async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({
-        status: false,
-        message: "Something went wrong",
-        err: error.message,
-      });
+    return res.status(500).json({
+      status: false,
+      message: "Something went wrong",
+      err: error.message,
+    });
   }
 });
 
-const createUserDetails = asyncHandler(async (req, res) => {
+const createPropertyRental = asyncHandler(async (req, res) => {
   try {
-    const {
-      gender,
-      address,
-      nationalId,
-      nationality,
-      dob,
-      profession,
-      photoTypeId,
-      photoId,
-      photoFront,
-      photoBack,
-      photoGuest,
-      city,
-      passportNo,
-      balance,
-      bookingNo,
-      visaNo,
-      purpose,
-    } = req.body;
+    const { workExperience, travelingPreferences, reviewsAndReferences } =
+      req.body;
 
     const obj = {
-      gender,
-      address,
-      nationalId,
-      nationality,
-      dob,
-      profession,
-      photoTypeId,
-      photoId,
-      photoFront,
-      photoBack,
-      photoGuest,
-      city,
-      passportNo,
-      balance,
-      bookingNo,
-      visaNo,
-      purpose,
+      workExperience: workExperience,
+      travelingPreferences: travelingPreferences,
+      reviewsAndReferences: reviewsAndReferences,
       loggedInUserId: req.person.id,
     };
-    const userDetails = await UserDetails.create(obj);
-    const response = await userDetails.save();
+    const propertyRental = await PropertyRental.create(obj);
+    const response = await propertyRental.save();
     return res.status(201).json({
       status: true,
       response: response,
-      message: "User Details successfully created!",
+      message: "Property Rental Details successfully created!",
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res
+      .status(500)
+      .json({ status: false, message: "Something went wrong" });
+  }
+});
+
+const createFavoritedProperties = asyncHandler(async (req, res) => {
+  try {
+    const { myCities, hobbies, myLandlords, myAssignments } = req.body;
+
+    const obj = {
+      myCities: myCities,
+      hobbies: hobbies,
+      myLandlords: myLandlords,
+      myAssignments: myAssignments,
+      loggedInUserId: req.person.id,
+    };
+    const favoritedProterties = await FavoritedProperties.create(obj);
+    const response = await favoritedProterties.save();
+    return res.status(201).json({
+      status: true,
+      response: response,
+      message: "Favorited proterties Details successfully created!",
     });
   } catch (error) {
     console.log(error.message);
@@ -185,15 +180,15 @@ const login = asyncHandler(async (req, res) => {
       });
     }
 
-    const userDetails = await User.findOne({ where: { email: email } });
+    const userInfo = await User.findOne({ where: { email: email } });
 
-    if (!userDetails) {
+    if (!userInfo) {
       return res
         .status(401)
         .json({ status: "error", message: "email incorrect" });
     }
 
-    const isPassMatch = await checkPassword(password, userDetails.password);
+    const isPassMatch = await checkPassword(password, userInfo.password);
 
     if (!isPassMatch) {
       return res
@@ -202,17 +197,17 @@ const login = asyncHandler(async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: userDetails.id, userTypeId: userDetails.userTypeId },
+      { id: userInfo.id, userTypeId: userInfo.userTypeId },
       secretKey,
       { expiresIn }
     );
     const data = {
-      userId: userDetails.id,
-      firstName: userDetails.firstName,
-      lastName: userDetails.lastName,
-      email: userDetails.email,
-      phoneNumber: userDetails.phoneNumber,
-      userTypeId: userDetails.userTypeId,
+      userId: userInfo.id,
+      firstName: userInfo.firstName,
+      lastName: userInfo.lastName,
+      email: userInfo.email,
+      phoneNumber: userInfo.phoneNumber,
+      userTypeId: userInfo.userTypeId,
       token: token,
     };
 
@@ -250,10 +245,10 @@ const forgetPass = asyncHandler(async (req, res) => {
   try {
     const { email } = req.body;
 
-    const userDetails = await User.findOne({
+    const userDetail = await User.findOne({
       where: { email: email },
     });
-    if (!userDetails) {
+    if (!userDetail) {
       return res.status(404).json({ status: false, message: "No user found" });
     }
 
@@ -358,12 +353,33 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
-const updateUserDetails = asyncHandler(async (req, res) => {
+const updatePropertyRentalDetails = asyncHandler(async (req, res) => {
   try {
     let reqBody = req.body;
 
-    const response = await UserDetails.update(reqBody, {
-      where: { id: req.person.id },
+    const response = await PropertyRental.update(reqBody, {
+      where: { loggedInUserId: req.person.id },
+    });
+
+    return res.status(201).json({
+      status: response[0] === 0 ? 404 : 200,
+      data: response,
+      message: response[0] === 0 ? "Nothing updated" : "Successfully Updated!",
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res
+      .status(500)
+      .json({ status: 500, message: "Something went wrong" });
+  }
+});
+
+const updateFavoritedPropertiesDetails = asyncHandler(async (req, res) => {
+  try {
+    let reqBody = req.body;
+
+    const response = await FavoritedProperties.update(reqBody, {
+      where: { loggedInUserId: req.person.id },
     });
 
     return res.status(201).json({
@@ -396,9 +412,7 @@ const getUserById = asyncHandler(async (req, res) => {
     return res.status(200).json({
       status: "success",
       data: response,
-      message: response.length
-        ? "Successfully fetch data"
-        : "User Not Present!",
+      message: response ? "Successfully fetch data" : "User Not Present!",
     });
   } catch (error) {
     console.log(error.message);
@@ -427,9 +441,30 @@ const getAllUsers = asyncHandler(async (req, res) => {
   }
 });
 
-const getUserDetails = asyncHandler(async (req, res) => {
+const getPropertyRentalDetails = asyncHandler(async (req, res) => {
   try {
-    const response = await UserDetails.findOne({
+    const response = await PropertyRental.findOne({
+      where: { loggedInUserId: req.person.id },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      data: response,
+      message: response.length ? "Successfully fetch data" : "No data found",
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong",
+      messageInfo: error,
+    });
+  }
+});
+
+const getFavoritedPropertiesDetails = asyncHandler(async (req, res) => {
+  try {
+    const response = await FavoritedProperties.findAll({
       where: { loggedInUserId: req.person.id },
     });
 
@@ -496,15 +531,18 @@ const updatePassword = asyncHandler(async (req, res) => {
 module.exports = {
   login,
   addUser,
-  forgetPass,
-  fpUpdatePass,
   logOut,
+  forgetPass,
   updateUser,
-  getUserById,
-  updatePassword,
   getAllUsers,
-  createUserDetails,
+  getUserById,
+  fpUpdatePass,
   createUserType,
-  updateUserDetails,
-  getUserDetails
+  updatePassword,
+  createPropertyRental,
+  getPropertyRentalDetails,
+  createFavoritedProperties,
+  updatePropertyRentalDetails,
+  getFavoritedPropertiesDetails,
+  updateFavoritedPropertiesDetails,
 };

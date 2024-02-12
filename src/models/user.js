@@ -19,9 +19,6 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    displayName: {
-      type: DataTypes.STRING,
-    },
     email: {
       type: DataTypes.STRING,
     },
@@ -32,23 +29,7 @@ const User = sequelize.define(
     phoneNumber: {
       type: DataTypes.STRING,
     },
-    city: {
-      type: DataTypes.STRING,
-    },
-    state: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    homeTown: {
-      type: DataTypes.STRING,
-    },
-    petInfo: {
-      type: DataTypes.STRING,
-    },
-    moreInfo: {
-      type: DataTypes.STRING,
-    },
-    petImage: {
+    displayName: {
       type: DataTypes.STRING,
     },
     userTypeId: {
@@ -65,6 +46,7 @@ const User = sequelize.define(
   },
   {
     tableName: "User",
+    updatedAt: false,
   }
 );
 
@@ -72,6 +54,6 @@ const User = sequelize.define(
   await User.sync({ force: false });
 })();
 
-User.belongsTo(UserType, { foreignKey: "userTypeId"});
+User.belongsTo(UserType, { foreignKey: "userTypeId" });
 
 module.exports = User;
