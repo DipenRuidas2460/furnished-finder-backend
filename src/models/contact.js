@@ -10,14 +10,14 @@ const Contact = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    country: {
+    email: {
       type: DataTypes.STRING,
     },
-    state: {
+    phone: {
       type: DataTypes.STRING,
     },
-    city: {
-      type: DataTypes.STRING,
+    otherContact: {
+      type: DataTypes.JSON,
     },
     loggedInUserId: {
       type: DataTypes.INTEGER,

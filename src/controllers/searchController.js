@@ -22,18 +22,17 @@ const createSavedSearches = asyncHandler(async (req, res) => {
       response: response,
       message: "Search Data successfully Stored!",
     });
-  } catch (error) {
-    console.log(error.message);
+  } catch (err) {
+    console.log(err.message);
     return res
       .status(500)
-      .json({ status: false, message: "Something went wrong" });
+      .json({ status: false, message: "Something went wrong", error: err });
   }
 });
 
 const getAllSearchDetails = asyncHandler(async (req, res) => {
   try {
     const response = await MySearches.findAll({});
-
     return res.status(200).json({
       status: "success",
       data: response,
@@ -70,21 +69,21 @@ const getSearchDetailsById = asyncHandler(async (req, res) => {
   }
 });
 
-const deleteSearchDetails = asyncHandler(async (req, res) => {
+const deleteSearchDetailsById = asyncHandler(async (req, res) => {
   try {
     await MySearches.destroy({
       where: { id: req.params.searchId },
     });
 
-    return res.status(201).json({
+    return res.status(200).json({
       status: "Success!",
       message: "Successfully Deleted!",
     });
-  } catch (error) {
-    console.log(error.message);
+  } catch (err) {
+    console.log(err.message);
     return res
       .status(500)
-      .json({ status: 500, message: "Something went wrong" });
+      .json({ status: false, message: "Something went wrong", error: err });
   }
 });
 
@@ -92,5 +91,5 @@ module.exports = {
   createSavedSearches,
   getAllSearchDetails,
   getSearchDetailsById,
-  deleteSearchDetails
+  deleteSearchDetailsById
 };

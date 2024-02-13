@@ -12,6 +12,8 @@ const {
 const moment = require("moment");
 const { sendMail } = require("../helper/sendMail");
 const FavoritedProperties = require("../models/favoritedProperties");
+const UserDetails = require("../models/userDetails");
+const path = require("path");
 
 const secretKey = process.env.TOKEN_secret_key;
 const expiresIn = "24h";
@@ -96,6 +98,63 @@ const addUser = asyncHandler(async (req, res) => {
       message: "Something went wrong",
       err: error.message,
     });
+  }
+});
+
+const createUserDetails = asyncHandler(async (req, res) => {
+  try {
+    const {
+      country,
+      state,
+      city,
+      homeTown,
+      propertyTypes,
+      isSublet,
+      units,
+      petInfo,
+      moreInfo,
+      unKnownDetails,
+      isRentedBefore,
+    } = req.body;
+
+    const petImage = req.files.petImage;
+    const filTypeArr = petImage.name.split(".");
+    const imagePath = path.join(
+      __dirname,
+      "../uploads/petImage/",
+      `${req.person.id}_petImage.${filTypeArr[1]}`
+    );
+    await petImage.mv(imagePath);
+
+    const obj = {
+      country,
+      state,
+      city,
+      homeTown,
+      propertyTypes,
+      isSublet,
+      units,
+      petInfo,
+      petImage: `${req.person.id}_petImage.${filTypeArr[1]}`,
+      moreInfo,
+      unKnownDetails,
+      isRentedBefore,
+      loggedInUserId: req.person.id,
+    };
+
+    const userDetails = await UserDetails.create(obj);
+    const response = await userDetails.save();
+    return res.status(201).json({
+      status: true,
+      response: response,
+      petImageUrl: `${process.env.BCK_URL}/assets/petImage/${req.person.id}_petImage.${filTypeArr[1]}`,
+      message: "User Details successfully created!",
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res
+      .status(500)
+      .json({ status: false, message: "Something went wrong", err: error });
   }
 });
 
@@ -361,7 +420,7 @@ const updatePropertyRentalDetails = asyncHandler(async (req, res) => {
       where: { loggedInUserId: req.person.id },
     });
 
-    return res.status(201).json({
+    return res.status(200).json({
       status: response[0] === 0 ? 404 : 200,
       data: response,
       message: response[0] === 0 ? "Nothing updated" : "Successfully Updated!",
@@ -382,7 +441,41 @@ const updateFavoritedPropertiesDetails = asyncHandler(async (req, res) => {
       where: { loggedInUserId: req.person.id },
     });
 
-    return res.status(201).json({
+    return res.status(200).json({
+      status: response[0] === 0 ? 404 : 200,
+      data: response,
+      message: response[0] === 0 ? "Nothing updated" : "Successfully Updated!",
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res
+      .status(500)
+      .json({ status: 500, message: "Something went wrong" });
+  }
+});
+
+const updateUserDetails = asyncHandler(async (req, res) => {
+  try {
+    let reqBody = req.body;
+    const petImage = req.files.petImage;
+    if (petImage) {
+      const filTypeArr = petImage.name.split(".");
+      const imagePath = path.join(
+        __dirname,
+        "../uploads/petImage/",
+        `${req.person.id}_petImage.${filTypeArr[1]}`
+      );
+      await petImage.mv(imagePath);
+      reqBody.petImage = `${req.person.id}_petImage.${filTypeArr[1]}`;
+    } else if (petImage === "") {
+      reqBody.petImage = null;
+    }
+
+    const response = await UserDetails.update(reqBody, {
+      where: { loggedInUserId: req.person.id },
+    });
+
+    return res.status(200).json({
       status: response[0] === 0 ? 404 : 200,
       data: response,
       message: response[0] === 0 ? "Nothing updated" : "Successfully Updated!",
@@ -483,6 +576,28 @@ const getFavoritedPropertiesDetails = asyncHandler(async (req, res) => {
   }
 });
 
+const getUserDetails = asyncHandler(async (req, res) => {
+  try {
+    const response = await UserDetails.findOne({
+      where: { loggedInUserId: req.person.id },
+    });
+
+    return res.status(200).json({
+      message: response ? "Successfully fetch data" : "No data found",
+      status: "success",
+      data: response,
+      petImageUrl: `${process.env.BCK_URL}/assets/petImage/${response.petImage}`,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong",
+      messageInfo: error,
+    });
+  }
+});
+
 const updatePassword = asyncHandler(async (req, res) => {
   try {
     const response = await User.findOne({ where: { id: req.person.id } });
@@ -537,8 +652,11 @@ module.exports = {
   getAllUsers,
   getUserById,
   fpUpdatePass,
-  createUserType,
+  getUserDetails,
   updatePassword,
+  createUserType,
+  createUserDetails,
+  updateUserDetails,
   createPropertyRental,
   getPropertyRentalDetails,
   createFavoritedProperties,

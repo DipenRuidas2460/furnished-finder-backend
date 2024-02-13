@@ -34,6 +34,9 @@ const UserDetails = sequelize.define(
     petInfo: {
       type: DataTypes.STRING,
     },
+    petImage: {
+      type: DataTypes.STRING,
+    },
     moreInfo: {
       type: DataTypes.STRING,
     },

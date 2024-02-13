@@ -2,6 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/dbConfig");
 const User = require("./user");
 const Review = require("./review");
+const Contact = require("./contact");
 
 const Property = sequelize.define(
   "Property",
@@ -17,6 +18,9 @@ const Property = sequelize.define(
     propertyType: {
       type: DataTypes.STRING,
     },
+    propertyImage: {
+      type: DataTypes.JSON,
+    },
     propertyDescription: {
       type: DataTypes.STRING,
     },
@@ -24,7 +28,7 @@ const Property = sequelize.define(
       type: DataTypes.JSON,
     },
     availablity: {
-        type: DataTypes.STRING,
+      type: DataTypes.JSON,
     },
     contactId: {
       type: DataTypes.INTEGER,
@@ -47,6 +51,8 @@ const Property = sequelize.define(
 })();
 
 Property.belongsTo(User, { foreignKey: "loggedInUserId" });
+Review.hasMany(Property);
 Property.belongsTo(Review, { foreignKey: "reviewId" });
+Property.belongsTo(Contact, { foreignKey: "contactId" });
 
 module.exports = Property;

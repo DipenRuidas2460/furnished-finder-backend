@@ -1,7 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/dbConfig");
 const User = require("./user");
-const Property = require("./property");
 
 const Review = sequelize.define(
   "Review",
@@ -20,17 +19,17 @@ const Review = sequelize.define(
     title: {
       type: DataTypes.STRING,
     },
-    isStay:{
-      type:DataTypes.BOOLEAN,
+    isStay: {
+      type: DataTypes.BOOLEAN,
     },
     details: {
-        type: DataTypes.STRING,
+      type: DataTypes.STRING,
     },
     phone: {
-        type: DataTypes.STRING,  
+      type: DataTypes.STRING,
     },
     stayDates: {
-        type: DataTypes.STRING,
+      type: DataTypes.STRING,
     },
     ratings: {
       type: DataTypes.STRING,
@@ -46,7 +45,6 @@ const Review = sequelize.define(
   await Review.sync({ force: false });
 })();
 
-Review.belongsTo(User, { foreignKey: "userId" } )
-Review.belongsTo(Property, { foreignKey: "propertyId" } )
+Review.belongsTo(User, { foreignKey: "userId" });
 
 module.exports = Review;

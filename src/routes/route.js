@@ -14,6 +14,9 @@ const {
   fpUpdatePass,
   createUserType,
   updatePassword,
+  getUserDetails,
+  updateUserDetails,
+  createUserDetails,
   createPropertyRental,
   getPropertyRentalDetails,
   createFavoritedProperties,
@@ -25,13 +28,33 @@ const {
 const {
   createSavedSearches,
   getAllSearchDetails,
-  deleteSearchDetails,
+  deleteSearchDetailsById,
   getSearchDetailsById,
 } = require("../controllers/searchController");
+
+const {
+  createPropertyList,
+  getAllPropertyDetails,
+  getPropertyDetailsById,
+  updatePropertyDetailsById,
+  deletePropertyDetailsById,
+} = require("../controllers/propertyController");
+
+const { getPetImage, getPropertyImage } = require("../helper/fileHelper");
+
+// ****** get files ************************************************
+
+router.get("/assets/petImage/:fileName", getPetImage);
+router.get("/assets/propertyImg/:fileName", getPropertyImage);
 
 // --------------------------------------- User Route ----------------------------------------------------------------------------------
 
 router.post("/user/register", addUser);
+router.post(
+  "/user/create-userDetails",
+  validateTokenMiddleware,
+  createUserDetails
+);
 router.post("/user/userType", createUserType);
 router.post("/user/login", login);
 router.get("/user/logout", logOut);
@@ -58,6 +81,11 @@ router.put(
   validateTokenMiddleware,
   updateFavoritedPropertiesDetails
 );
+router.put(
+  "/user/updateUserDetails",
+  validateTokenMiddleware,
+  updateUserDetails
+);
 router.patch("/user/updatePassword", validateTokenMiddleware, updatePassword);
 router.get("/user/getUserById", validateTokenMiddleware, getUserById);
 router.get("/user/getAllUsers", validateTokenMiddleware, getAllUsers);
@@ -71,6 +99,7 @@ router.get(
   validateTokenMiddleware,
   getFavoritedPropertiesDetails
 );
+router.get("/user/getUserDetails", validateTokenMiddleware, getUserDetails);
 
 // --------------------------------------- Saved Searches Route ----------------------------------------------------------------------------------
 
@@ -92,7 +121,39 @@ router.get(
 router.delete(
   "/saved-search/delete-saved-searches/:searchId",
   validateTokenMiddleware,
-  deleteSearchDetails
+  deleteSearchDetailsById
+);
+
+// --------------------------------------- Property Route ----------------------------------------------------------------------------------
+
+router.post(
+  "/property/create-property",
+  validateTokenMiddleware,
+  createPropertyList
+);
+
+router.get(
+  "/property/fetch-all-property",
+  validateTokenMiddleware,
+  getAllPropertyDetails
+);
+
+router.get(
+  "/property/fetch-property/:propertyId",
+  validateTokenMiddleware,
+  getPropertyDetailsById
+);
+
+router.put(
+  "/property/update-property/:propertyId",
+  validateTokenMiddleware,
+  updatePropertyDetailsById
+);
+
+router.delete(
+  "/property/delete-property/:propertyId",
+  validateTokenMiddleware,
+  deletePropertyDetailsById
 );
 
 module.exports = router;
