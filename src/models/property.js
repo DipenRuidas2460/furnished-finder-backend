@@ -12,10 +12,22 @@ const Property = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
+    unit: {
+      type: DataTypes.STRING,
+    },
     location: {
       type: DataTypes.STRING,
     },
     propertyType: {
+      type: DataTypes.STRING,
+    },
+    price: {
+      type: DataTypes.STRING,
+    },
+    bathType: {
+      type: DataTypes.STRING,
+    },
+    entranceType: {
       type: DataTypes.STRING,
     },
     propertyImage: {
@@ -24,11 +36,26 @@ const Property = sequelize.define(
     propertyDescription: {
       type: DataTypes.STRING,
     },
+    squreFootage: {
+      type: DataTypes.STRING,
+    },
+    bedRooms: {
+      type: DataTypes.STRING,
+    },
+    bathRooms: {
+      type: DataTypes.STRING,
+    },
+    isFurnished:{
+      type: DataTypes.BOOLEAN,
+    },
     features: {
       type: DataTypes.JSON,
     },
-    availablity: {
+    accommodations: {
       type: DataTypes.JSON,
+    },
+    availablity: {
+      type: DataTypes.STRING,
     },
     contactId: {
       type: DataTypes.INTEGER,
@@ -53,6 +80,7 @@ const Property = sequelize.define(
 Property.belongsTo(User, { foreignKey: "loggedInUserId" });
 Review.hasMany(Property);
 Property.belongsTo(Review, { foreignKey: "reviewId" });
+Review.hasMany(Contact);
 Property.belongsTo(Contact, { foreignKey: "contactId" });
 
 module.exports = Property;

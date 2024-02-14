@@ -22,7 +22,7 @@ const Review = sequelize.define(
     isStay: {
       type: DataTypes.BOOLEAN,
     },
-    details: {
+    detailedReview: {
       type: DataTypes.STRING,
     },
     phone: {

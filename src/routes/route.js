@@ -42,6 +42,39 @@ const {
 
 const { getPetImage, getPropertyImage } = require("../helper/fileHelper");
 
+const {
+  createReviewList,
+  getAllReviewByPropertyId,
+  getAllReviewByPropertyOwnerId,
+  deletePropertyReviewByPropertyId,
+} = require("../controllers/reviewController");
+
+const {
+  createContactList,
+  getContactByContactId,
+  updateContact,
+  deleteContact,
+} = require("../controllers/contactController");
+
+const {
+  createTravelerHousingRequest,
+  getTravelerHousingRequest,
+  updateTravelerHousingRequest,
+} = require("../controllers/travelerHousingRequestController");
+
+const {
+  createAgencyHousingRequest,
+  getAgencyHousingRequest,
+  updateAgencyHousingRequest,
+} = require("../controllers/agencyHousingRequestController");
+
+const {
+  createBooking,
+  getBooking,
+  updateBooking,
+  deleteBooking,
+} = require("../controllers/bookingController");
+
 // ****** get files ************************************************
 
 router.get("/assets/petImage/:fileName", getPetImage);
@@ -155,5 +188,99 @@ router.delete(
   validateTokenMiddleware,
   deletePropertyDetailsById
 );
+
+// --------------------------------------- Review Route ----------------------------------------------------------------------------------
+
+router.post("/review/create-review", validateTokenMiddleware, createReviewList);
+
+router.get(
+  "/review/fetchAll-review/:propertyId",
+  validateTokenMiddleware,
+  getAllReviewByPropertyId
+);
+
+router.get(
+  "/review/fetchAll-review/:propertyOwnerId",
+  validateTokenMiddleware,
+  getAllReviewByPropertyOwnerId
+);
+
+router.delete(
+  "/review/delete-review/:propertyId",
+  validateTokenMiddleware,
+  deletePropertyReviewByPropertyId
+);
+
+// --------------------------------------- Contact Route ----------------------------------------------------------------------------------
+
+router.post(
+  "/contact/create-contact",
+  validateTokenMiddleware,
+  createContactList
+);
+
+router.get(
+  "/contact/fetch-contact/:contactId",
+  validateTokenMiddleware,
+  getContactByContactId
+);
+
+router.put("/contact/update-contact", validateTokenMiddleware, updateContact);
+
+router.delete(
+  "/contact/delete-contact",
+  validateTokenMiddleware,
+  deleteContact
+);
+
+// --------------------------------------- Traveler Housing Request Route ----------------------------------------------------------------------------------
+
+router.post(
+  "/traveler-housing-request/create",
+  validateTokenMiddleware,
+  createTravelerHousingRequest
+);
+
+router.get(
+  "/traveler-housing-request/fetch",
+  validateTokenMiddleware,
+  getTravelerHousingRequest
+);
+
+router.put(
+  "/traveler-housing-request/update",
+  validateTokenMiddleware,
+  updateTravelerHousingRequest
+);
+
+// --------------------------------------- Agency Housing Request Route ----------------------------------------------------------------------------------
+
+router.post(
+  "/agency-housing-request/create",
+  validateTokenMiddleware,
+  createAgencyHousingRequest
+);
+
+router.get(
+  "/agency-housing-request/fetch",
+  validateTokenMiddleware,
+  getAgencyHousingRequest
+);
+
+router.put(
+  "/agency-housing-request/update",
+  validateTokenMiddleware,
+  updateAgencyHousingRequest
+);
+
+// --------------------------------------- Booking Route ----------------------------------------------------------------------------------
+
+router.post("/booking/create", validateTokenMiddleware, createBooking);
+
+router.get("/booking/fetch", validateTokenMiddleware, getBooking);
+
+router.put("/booking/update", validateTokenMiddleware, updateBooking);
+
+router.delete("/booking/delete", validateTokenMiddleware, deleteBooking);
 
 module.exports = router;
